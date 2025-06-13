@@ -1,0 +1,2957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GEC - Global Engineering Center - Digital Energy</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="js/config.js"></script>
+  <script src="js/scrolling-message.js"></script>
+  <style>
+    :root {
+      --primary-green: #3DCD58;
+      --header-bg: #fff;
+      --nav-bg: #f4f4f4;
+      --nav-active: var(--primary-green);
+      --text-dark: #333;
+      --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    header {
+      background-color: var(--header-bg);
+      background-image: url('images/header-bg.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #e0e0e0;
+      position: relative;
+    }
+
+    /* Add an overlay to ensure text remains readable */
+    header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.9);
+      z-index: 0;
+    }
+
+    /* Ensure header content stays above the overlay */
+    .logo-container, .search-container, .icons-container {
+      position: relative;
+      z-index: 1;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .logo-container img {
+      height: 40px;
+    }
+
+    .impact-logo {
+      height: 24px;
+    }
+
+    .header-title {
+      font-size: 24px;
+      color: var(--primary-green);
+      margin: 0 70px;
+      white-space: nowrap;
+      letter-spacing: 1px;
+      word-spacing: 8px;
+      font-family: var(--font-family);
+    }
+
+    .header-title strong {
+      font-weight: bold;
+    }
+
+    .search-container {
+      flex: 0 1 400px;
+      margin-left: 20px;
+      margin-right: 60px;
+      position: relative;
+    }
+
+    .search-form {
+      width: 100%;
+      margin: 0;
+      position: relative;
+    }
+
+    .search-box {
+      width: 100%;
+      padding: 10px 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 15px;
+    }
+
+    /* Search Results Dropdown */
+    .search-results {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-top: 5px;
+      max-height: 500px;
+      overflow-y: auto;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      display: none;
+    }
+
+    .search-results.active {
+      display: block;
+    }
+
+    .search-result-item {
+      padding: 10px 15px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .search-result-item:hover {
+      background-color: #f5f5f5;
+    }
+
+    .search-result-item:last-child {
+      border-bottom: none;
+    }
+
+    .search-result-image {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+      background: #f8f8f8;
+      border-radius: 4px;
+    }
+
+    .search-result-info {
+      flex: 1;
+    }
+
+    .search-result-title {
+      font-weight: 500;
+      color: var(--text-dark);
+      margin: 0 0 4px;
+      font-size: 14px;
+    }
+
+    .search-result-folder {
+      color: #666;
+      font-size: 12px;
+    }
+
+    .load-more-btn {
+      width: 100%;
+      padding: 10px;
+      background: #f8f8f8;
+      border: none;
+      border-top: 1px solid #eee;
+      color: var(--primary-green);
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .load-more-btn:hover {
+      background: #f0f0f0;
+    }
+
+    .no-results {
+      padding: 20px;
+      text-align: center;
+      color: #666;
+    }
+
+    .icons-container {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .icon-link {
+      position: relative;
+      display: inline-block;
+    }
+
+    .icon-link img {
+      width: 24px;
+      height: 24px;
+      transition: transform 0.3s ease;
+    }
+
+    .icon-link:hover img {
+      transform: scale(1.1);
+    }
+
+    /* Add styles for contact dropdown */
+    .contact-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: white;
+      min-width: 250px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      border-radius: 4px;
+      z-index: 1000;
+      margin-top: 10px;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .icon-link:hover .contact-dropdown,
+    .contact-dropdown:hover {
+      display: block;
+      opacity: 1;
+    }
+
+    .contact-dropdown-item {
+      padding: 12px 15px;
+      color: var(--text-dark);
+      text-decoration: none;
+      display: block;
+      border-bottom: 1px solid #eee;
+      transition: all 0.3s ease;
+      font-family: var(--font-family);
+    }
+
+    .contact-dropdown-item:last-child {
+      border-bottom: none;
+    }
+
+    .contact-dropdown-item:hover {
+      background: var(--primary-green);
+      color: white;
+    }
+
+    .contact-dropdown-header {
+      padding: 12px 15px;
+      font-weight: 500;
+      color: var(--text-dark);
+      background: #f8f8f8;
+      border-bottom: 1px solid #eee;
+    }
+
+    .main-nav {
+      background-color: #f8f8f8;
+      padding: 0;
+      margin: 0;
+      border-bottom: 1px solid #e0e0e0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .nav-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      justify-content: flex-start;
+      margin-bottom: 5px;
+      align-items: center;
+      background-color: #f8f8f8;
+    }
+
+    .nav-item {
+      padding: 15px 25px;
+      cursor: pointer;
+      color: var(--text-dark);
+      position: relative;
+      font-family: var(--font-family);
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      background-color: var(--primary-green);
+      color: white;
+    }
+
+    .submenu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      z-index: 1000;
+      min-width: 200px;
+    }
+
+    .nav-item:hover .submenu {
+      display: block;
+    }
+
+    /* Add styles for the cart count */
+    #header-cart-count {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #dc3545;
+      color: white;
+      border-radius: 50%;
+      padding: 2px 6px;
+      font-size: 12px;
+      min-width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .profile-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: #e0e0e0;
+    }
+
+    /* Pagination Settings */
+    .pagination {
+      display: flex;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      background-color: var(--nav-bg);
+      border-radius: 4px;
+      width: 100%;
+      justify-content: center;
+      gap: 15px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .dropdown {
+      position: relative;
+      flex: 0 1 170px;
+      min-width: 150px;
+      max-width: 170px;
+      margin: 0;
+    }
+
+    .dropdown-btn {
+      padding: 15px 8px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-dark);
+      font-size: 13px;
+      transition: background-color 0.3s;
+      width: 100%;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-family: var(--font-family);
+    }
+
+    .dropdown:hover .dropdown-btn {
+      background-color: var(--primary-green);
+      color: white;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      min-width: 250px;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    .submenu-header {
+      display: flex;
+      background-color: rgba(244, 244, 244, 0.95);
+      padding: 10px;
+      border-bottom: 1px solid rgba(224, 224, 224, 0.3);
+    }
+
+    .submenu-title {
+      flex: 1;
+      text-align: center;
+      padding: 8px;
+      cursor: pointer;
+      color: var(--text-dark);
+      background-color: rgba(255, 255, 255, 0.5);
+      border-radius: 4px;
+      transition: all 0.3s ease;
+      margin: 0 5px;
+    }
+
+    .submenu-title:hover {
+      background-color: rgba(61, 205, 88, 0.9);
+      color: white;
+    }
+
+    .pagination-bar {
+      background-color: var(--nav-bg);
+      padding: 8px 0;
+      border-radius: 4px;
+      margin-top: -10px;
+      width: 100%;
+      margin-right: 0;
+      box-sizing: border-box;
+      display: flex;
+      justify-content: center;
+    }
+
+    .pagination-settings {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      background-color: var(--nav-bg);
+    }
+
+    .pagination-container {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      padding: 0 20px;
+      background-color: var(--nav-bg);
+      margin: 0 auto;
+    }
+
+    .main-layout {
+      padding: 0;
+      width: 100%;
+      background-color: var(--nav-bg);
+    }
+
+    .content-area {
+      margin-top: -10px;
+      width: 100%;
+      padding: 0;
+      background-color: var(--nav-bg);
+    }
+
+    .pagination-header {
+      margin-top: 0;
+      width: 100%;
+      background-color: var(--nav-bg);
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      overflow-x: hidden;
+      position: relative;
+      min-height: 100vh;
+      background: transparent;
+      font-family: var(--font-family);
+    }
+
+    .submenu-body {
+      padding: 5px;
+    }
+
+    .submenu-column {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      padding: 5px;
+    }
+
+    .submenu-column a {
+      color: var(--text-dark);
+      text-decoration: none;
+      padding: 12px 20px;
+      display: block;
+      transition: all 0.3s ease;
+      font-size: 14px;
+      border-radius: 4px;
+      background-color: rgba(255, 255, 255, 0.3);
+      font-family: var(--font-family);
+    }
+
+    .submenu-column a:hover {
+      background-color: var(--primary-green);
+      color: white;
+      box-shadow: 0 2px 8px rgba(61, 205, 88, 0.2);
+    }
+
+    .graphics-column {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      width: 100%;
+    }
+
+    .graphics-column.active {
+      display: flex;
+    }
+
+    /* Product Grid Styles */
+    .products-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 15px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      background: none;
+      overflow: hidden;
+      height: auto;
+    }
+
+    .product-card {
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      height: 200px;  /* Reduced height */
+      display: flex;
+      flex-direction: column;
+      padding: 5px;  /* Reduced padding */
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .product-image {
+      width: 100%;
+      height: 160px;  /* Adjusted height */
+      object-fit: contain;
+      margin: 0;  /* Removed margin */
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .product-title {
+      padding: 2px;  /* Reduced padding */
+      font-size: 13px;
+      color: var(--text-dark);
+      text-align: center;
+      min-height: 30px;  /* Reduced height */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+    
+    @media (max-width: 1200px) {
+      .products-container {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .products-container {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .products-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 1200px) {
+      .pagination {
+        gap: 8px;
+      }
+      
+      .dropdown {
+        flex: 0 1 150px;
+        min-width: 130px;
+      }
+    }
+    
+    @media (max-width: 992px) {
+      .pagination {
+        gap: 5px;
+        flex-wrap: wrap;
+      }
+      
+      .dropdown {
+        flex: 0 1 140px;
+        min-width: 110px;
+      }
+
+      .dropdown-btn {
+        padding: 12px 6px;
+        font-size: 12px;
+      }
+    }
+
+    /* Add these styles at the beginning of the style section */
+    .background-slideshow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transform: translateX(100%);
+      background-size: cover;
+      background-position: center;
+      animation: slideAnimation 25s infinite;
+    }
+
+    .slide:nth-child(1) {
+      animation-delay: 0s;
+    }
+    .slide:nth-child(2) {
+      animation-delay: 5s;
+    }
+    .slide:nth-child(3) {
+      animation-delay: 10s;
+    }
+    .slide:nth-child(4) {
+      animation-delay: 15s;
+    }
+    .slide:nth-child(5) {
+      animation-delay: 20s;
+    }
+
+    @keyframes slideAnimation {
+      0% {
+        opacity: 0;
+        transform: translateX(100%);
+      }
+      5% {
+        opacity: 1;
+        transform: translateX(0);
+      }
+      20% {
+        opacity: 1;
+        transform: translateX(0);
+      }
+      25% {
+        opacity: 0;
+        transform: translateX(-100%);
+      }
+      100% {
+        opacity: 0;
+        transform: translateX(-100%);
+      }
+    }
+
+    /* Update the overlay to be more transparent */
+    .content-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.65);
+      z-index: -1;
+    }
+
+    .scrolling-message {
+      flex: 1;
+      overflow: hidden;
+      white-space: nowrap;
+      margin-left: 20px;
+      position: relative;
+    }
+
+    .scrolling-text {
+      display: inline-block;
+      animation: scrollText 20s linear infinite;
+      color: var(--primary-green);
+      font-weight: 500;
+      position: relative;
+      padding-left: 100%;
+      white-space: nowrap;
+      font-family: var(--font-family);
+    }
+
+    @keyframes scrollText {
+      0% {
+        transform: translateX(0);
+      }
+      100% {
+        transform: translateX(-100%);
+      }
+    }
+    
+    /* Product display styles */
+    .loading, .error, .no-products {
+        padding: 30px;
+        text-align: center;
+        width: 100%;
+        font-size: 18px;
+        grid-column: 1 / -1;
+    }
+    
+    .loading {
+        color: #666;
+    }
+    
+    .error {
+        color: #d9534f;
+    }
+    
+    .no-products {
+        color: #666;
+        font-style: italic;
+    }
+    
+    .product-hours {
+        color: #666;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+    
+    .modal-metadata {
+        margin-top: 15px;
+        padding: 10px;
+        background-color: #f8f8f8;
+        border-radius: 4px;
+    }
+
+    /* Add these new styles for products */
+    .products-container {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      padding: 15px;
+      max-width: 1400px;
+      margin: 0 auto;
+      height: auto;
+      overflow: hidden;
+      background: none;
+    }
+
+    .product-card {
+      background: rgba(255, 255, 255, 0.8);  /* Changed from solid white to translucent */
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      height: 200px;  /* Reduced height */
+      display: flex;
+      flex-direction: column;
+      padding: 5px;  /* Reduced padding */
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .product-image {
+      width: 100%;
+      height: 160px;  /* Adjusted height */
+      object-fit: contain;  /* This ensures the full image is visible */
+      margin: 0;  /* Removed margin */
+      background: rgba(255, 255, 255, 0.3);  /* Slight background for image area */
+    }
+
+    .product-title {
+      padding: 2px;  /* Reduced padding */
+      font-size: 13px;
+      color: var(--text-dark);
+      text-align: center;
+      min-height: 30px;  /* Reduced height */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      flex-shrink: 0;  /* Prevent title from shrinking */
+    }
+    
+    @media (max-width: 1200px) {
+      .products-container {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .products-container {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .products-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Cart Modal Styles */
+    #cartModal .modal-content {
+      width: 95%;
+      max-width: 800px;
+      max-height: 50vh;
+      display: flex;
+      flex-direction: column;
+      padding: 15px;
+    }
+
+    .cart-items {
+      flex: 1;
+      overflow-y: auto;
+      max-height: calc(50vh - 120px);
+      padding-right: 10px;
+      margin: 10px 0;
+    }
+
+    .cart-total {
+      margin-top: 10px;
+      padding: 10px 0;
+      border-top: 1px solid #eee;
+    }
+
+    .cart-note {
+      margin: 5px 0;
+    }
+
+    .cart-actions {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .checkout-btn {
+      padding: 8px 20px;
+      background: var(--primary-green);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .checkout-btn:hover {
+      background: #0c7c59;
+      transform: translateY(-1px);
+    }
+
+    .clear-cart-btn {
+      padding: 8px 20px;
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .clear-cart-btn:hover {
+      background: #c82333;
+      transform: translateY(-1px);
+    }
+
+    .quantity-btn {
+      padding: 5px 10px;
+      border: 1px solid var(--primary-green);
+      background: var(--primary-green);
+      color: white;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+    }
+    
+    .quantity-btn:hover {
+      background: #0c7c59;
+      transform: translateY(-1px);
+    }
+
+    .quantity {
+      min-width: 30px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    /* Cart Item Styles */
+      .cart-item {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+        gap: 30px;
+        min-height: 200px;
+      }
+      
+      .cart-item-image {
+        width: 200px;
+        height: 200px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+      
+      .cart-item-image img {
+        width: 200px;
+        height: 200px;
+        object-fit: contain;
+        border-radius: 4px;
+      }
+      
+      .cart-item-details {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding-right: 15px;
+        justify-content: center;
+      }
+      
+      .cart-item-title {
+        font-weight: 700;
+        color: var(--text-dark);
+        font-size: 1.1em;
+      }
+
+    /* Checkout form modal styles */
+    .checkout-form-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .checkout-form-modal.show {
+      display: flex;
+    }
+
+    .checkout-form-content {
+      background: #fff;
+      width: 500px;
+      max-width: 90%;
+      border-radius: 12px;
+      padding: 20px;
+      position: relative;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      box-sizing: border-box;
+      overflow: hidden;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .checkout-form-title {
+      color: #333;
+      font-size: 20px;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--primary-green);
+    }
+
+    .checkout-form-group {
+      margin-bottom: 12px;
+      box-sizing: border-box;
+    }
+
+    .checkout-form-group label {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: 500;
+      color: #555;
+      font-size: 14px;
+    }
+
+    .checkout-form-group input,
+    .checkout-form-group textarea {
+      width: 100%;
+      padding: 8px 12px;
+      border: 2px solid #eee;
+      border-radius: 6px;
+      font-size: 14px;
+      background: #f8f8f8;
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+    }
+
+    .checkout-form-group input:focus,
+    .checkout-form-group textarea:focus {
+      border-color: var(--primary-green);
+      background: #fff;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(20, 163, 127, 0.1);
+    }
+
+    .checkout-form-group textarea {
+      resize: vertical;
+      min-height: 60px;
+      max-height: 100px;
+    }
+
+    .checkout-form-submit {
+      width: 100%;
+      padding: 15px;
+      background: var(--primary-green);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      position: relative;
+      box-sizing: border-box;
+    }
+
+    .checkout-form-submit:hover {
+      background: #0c7c59;
+      transform: translateY(-1px);
+    }
+
+    .checkout-form-submit:active {
+      transform: translateY(0);
+    }
+
+    .loading-spinner {
+      display: none;
+      margin-left: 10px;
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .success-message {
+      display: none;
+      text-align: center;
+      padding: 30px 20px;
+    }
+
+    .success-icon {
+      font-size: 48px;
+      color: var(--primary-green);
+      margin-bottom: 15px;
+    }
+
+    .success-title {
+      font-size: 24px;
+      color: var(--primary-green);
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .success-message p {
+      color: #666;
+      margin: 0;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: #999;
+      cursor: pointer;
+      padding: 5px;
+      transition: all 0.3s ease;
+    }
+
+    .close-modal:hover {
+      color: #666;
+      transform: scale(1.1);
+    }
+
+    .success-toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--primary-green);
+      color: white;
+      padding: 15px 25px;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      animation: slideUp 0.3s ease, slideDown 0.3s ease 2.7s;
+      z-index: 2000;
+    }
+
+    .success-toast .success-icon {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translate(-50%, 100%);
+        opacity: 0;
+      }
+      to {
+        transform: translate(-50%, 0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideDown {
+      from {
+        transform: translate(-50%, 0);
+        opacity: 1;
+      }
+      to {
+        transform: translate(-50%, 100%);
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .checkout-form-content {
+        padding: 20px;
+      }
+      
+      .checkout-form-title {
+        font-size: 20px;
+        margin-bottom: 20px;
+      }
+      
+      .checkout-form-group {
+        margin-bottom: 15px;
+      }
+    }
+    /* Update styles for the cart info icon */
+    .cart-info-icon {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      background: #999;
+      color: white;
+      border-radius: 50%;
+      margin-left: 10px;
+      font-size: 12px;
+      cursor: help;
+      transition: all 0.3s ease;
+      vertical-align: middle;
+      line-height: 20px;
+      text-align: center;
+    }
+
+    .cart-info-icon:hover {
+      transform: scale(1.1);
+      background: #777;
+    }
+
+    .cart-info-icon::after {
+      content: attr(title);
+      position: absolute;
+      left: 50%;
+      top: 100%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+    }
+
+    .cart-info-icon:hover::after {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .vertical-pagination-box {
+      background: linear-gradient(to top, #c8e6c9 0%, #ffffff 100%);
+      padding: 20px;
+      padding-top: 200px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      margin: -200px 0 20px 0;
+      position: relative;
+    }
+
+    .vertical-pagination {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 30px;
+      gap: 25px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .icon-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .icon-container {
+      width: 60px;
+      height: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      backdrop-filter: blur(5px);
+    }
+
+    .icon-container:hover {
+      transform: scale(1.1);
+    }
+
+    /* Product Modal Styles */
+    #productModal .modal-content {
+      width: 95%;
+      max-width: 1400px;
+    }
+
+    /* Cart Item Styles */
+    .cart-item {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+      gap: 15px;
+      min-height: 200px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    
+    .cart-item-image {
+      width: 160px;
+      height: 160px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    
+    .cart-item-image img {
+      width: 160px;
+      height: 160px;
+      object-fit: contain;
+      border-radius: 4px;
+    }
+    
+    .cart-item-details {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-right: 15px;
+      justify-content: center;
+    }
+    
+    .cart-item-title {
+      font-weight: 700;
+      color: var(--text-dark);
+      font-size: 1.1em;
+    }
+    
+    .cart-item-path {
+      font-size: 0.9em;
+      color: var(--text-muted);
+    }
+    
+    .cart-item-price {
+      font-weight: 500;
+      color: var(--text-dark);
+    }
+    
+    .cart-item-quantity {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .quantity-btn {
+      padding: 5px 10px;
+      border: 1px solid var(--primary-green);
+      background: var(--primary-green);
+      color: white;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+    }
+    
+    .quantity-btn:hover {
+      background: #0c7c59;
+      transform: translateY(-1px);
+    }
+
+    .remove-item {
+      padding: 5px 10px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #999;
+      font-size: 1.2em;
+      align-self: flex-start;
+    }
+
+    /* Fullscreen Modal Styles */
+    .fullscreen-modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(5px);
+    }
+
+    .fullscreen-modal-content {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+
+    .fullscreen-close {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      color: white;
+      font-size: 40px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 10000;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .fullscreen-close:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.1);
+    }
+
+    #fullscreenImage {
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    /* Add cursor pointer to modal image to indicate clickability */
+    .modal-image {
+      cursor: zoom-in !important;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-image:hover {
+      opacity: 0.9;
+    }
+  </style>
+  <!-- JavaScript for cart and checkout functionality -->
+</head>
+<body>
+  <!-- Add the background slideshow container right after body tag -->
+  <div class="background-slideshow">
+    <div class="slide" style="background-image: url('images/backgrounds/bg1.jpg');"></div>
+    <div class="slide" style="background-image: url('images/backgrounds/bg2.jpg');"></div>
+    <div class="slide" style="background-image: url('images/backgrounds/bg3.jpg');"></div>
+    <div class="slide" style="background-image: url('images/backgrounds/bg4.jpg');"></div>
+    <div class="slide" style="background-image: url('images/backgrounds/bg5.jpg');"></div>
+  </div>
+  <div class="content-overlay"></div>
+
+  <!-- Background Container -->
+  <div class="background-container"></div>
+
+  <!-- Header -->
+  <header>
+    <div class="logo-container">
+      <a href="index.html" style="text-decoration: none;">
+        <img src="images/schneider-logo.png" alt="Schneider Electric Logo">
+      </a>
+      <a href="index.html" style="text-decoration: none;">
+        <img src="images/impact-logo.png" alt="Impact Company" class="impact-logo">
+      </a>
+      <div class="header-title"><strong>Global Engineering Center</strong></div>
+    </div>
+    
+    <div class="search-container">
+      <div class="search-form">
+        <input type="text" class="search-box" placeholder="Search for people, topics, tools etc">
+        <div class="search-results">
+          <!-- Search results will be displayed here -->
+        </div>
+      </div>
+    </div>
+
+    <div class="icons-container">
+      <a href="about-us.html" class="icon-link">
+        <img src="images/About-us.png" alt="About Us" class="icon">
+      </a>
+      <div class="icon-link">
+        <img src="images/Contact-us.png" alt="Contact Us" class="icon">
+        <div class="contact-dropdown">
+          <div class="contact-dropdown-header">Contact Information</div>
+          <a href="mailto:regional@example.com" class="contact-dropdown-item">Regional spocs – regional@example.com – +1234567890</a>
+          <a href="mailto:estimation@example.com" class="contact-dropdown-item">Estimation – estimation@example.com</a>
+          <a href="mailto:software@example.com" class="contact-dropdown-item">Software – software@example.com</a>
+          <a href="mailto:graphics@example.com" class="contact-dropdown-item">Graphics – graphics@example.com</a>
+          <a href="mailto:engineering@example.com" class="contact-dropdown-item">Engineering – engineering@example.com</a>
+          <a href="mailto:bim@example.com" class="contact-dropdown-item">BIM – bim@example.com</a>
+        </div>
+      </div>
+      <a href="cart.html" class="icon-link">
+        <img src="images/cart.png" alt="Cart" class="icon">
+        <span id="header-cart-count" style="display: none;">0</span>
+      </a>
+    </div>
+  </header>
+
+  <nav class="main-nav">
+    <ul class="nav-list">
+      <li class="nav-item"><a href="page1.html" style="color: inherit; text-decoration: none;">Referral Projects</a></li>
+      <li class="nav-item"><a href="page2.html" style="color: inherit; text-decoration: none;">Testimonials</a></li>
+      <li class="nav-item"><a href="page3.html" style="color: inherit; text-decoration: none;">Feedbacks</a></li>
+      <li class="nav-item"><a href="https://app.smartsheet.com/b/form/5ae57541fff44670a5dc240380cf23d1" style="color: inherit; text-decoration: none;">Request Form</a></li>
+      <li class="nav-item"><a href="#" style="color: inherit; text-decoration: none;">Extra</a></li>
+      <div class="scrolling-message">
+        <div class="scrolling-text">This is a scrolling message and the message is scrolling This is a scrolling message and the message is scrolling This is a scrolling message and the message is scrolling</div>
+      </div>
+    </ul>
+  </nav>
+
+  <!-- Main Layout -->
+  <div class="main-layout">
+    <!-- Content Area -->
+    <div class="content-area">
+      <!-- Pagination Settings -->
+      <div class="pagination-header">
+        <div class="pagination-bar">
+          <div class="pagination-settings">
+            <div class="pagination-container">
+              <ul class="pagination">
+                <!-- Health Care Dropdown -->
+                <li class="dropdown">
+                  <button class="dropdown-btn">Health Care ▼</button>
+                  <div class="dropdown-content">
+                    <div class="submenu-header">
+                      <span class="submenu-title graphics-title" data-graphics-type="3d">3D Graphics</span>
+                      <span class="submenu-title graphics-title" data-graphics-type="2d">2D Graphics</span>
+              </div>
+                    <div class="submenu-body">
+                      <div class="submenu-column graphics-column graphics-column-3d">
+                        <a href="category-page-1.html">Homepage and Navigation</a>
+                        <a href="category-page-2.html">Floor Plans</a>
+                        <a href="category-page-3.html">Equipments</a>
+                        <a href="category-page-4.html">Summary Pages</a>
+                        <a href="category-page-5.html">Dashboards</a>
+                        <a href="category-page-6.html">SLD's</a>
+                </div>
+                      <div class="submenu-column graphics-column graphics-column-2d">
+                        <a href="category-page-7.html">Homepage and Navigation</a>
+                        <a href="category-page-8.html">Floor Plans</a>
+                        <a href="category-page-9.html">Equipments</a>
+                        <a href="category-page-10.html">Summary Pages</a>
+                        <a href="category-page-11.html">Dashboards</a>
+                        <a href="category-page-12.html">SLD's</a>
+              </div>
+            </div>
+                  </div>
+                </li>
+
+                <!-- Datacenter Dropdown -->
+                <li class="dropdown">
+                  <button class="dropdown-btn">Datacenter ▼</button>
+                  <div class="dropdown-content">
+                    <div class="submenu-header">
+                      <span class="submenu-title graphics-title" data-graphics-type="3d">3D Graphics</span>
+                      <span class="submenu-title graphics-title" data-graphics-type="2d">2D Graphics</span>
+              </div>
+                    <div class="submenu-body">
+                      <div class="submenu-column graphics-column graphics-column-3d">
+                        <a href="category-page-13.html">Homepage and Navigation</a>
+                        <a href="category-page-14.html">Floor Plans</a>
+                        <a href="category-page-15.html">Equipments</a>
+                        <a href="category-page-16.html">Summary Pages</a>
+                        <a href="category-page-17.html">Dashboards</a>
+                        <a href="category-page-18.html">SLD's</a>
+                </div>
+                      <div class="submenu-column graphics-column graphics-column-2d">
+                        <a href="category-page-19.html">Homepage and Navigation</a>
+                        <a href="category-page-20.html">Floor Plans</a>
+                        <a href="category-page-21.html">Equipments</a>
+                        <a href="category-page-22.html">Summary Pages</a>
+                        <a href="category-page-23.html">Dashboards</a>
+                        <a href="category-page-24.html">SLD's</a>
+              </div>
+            </div>
+                  </div>
+                </li>
+
+                <!-- Life Science Dropdown -->
+                <li class="dropdown">
+                  <button class="dropdown-btn">Life Science ▼</button>
+                  <div class="dropdown-content">
+                    <div class="submenu-header">
+                      <span class="submenu-title graphics-title" data-graphics-type="3d">3D Graphics</span>
+                      <span class="submenu-title graphics-title" data-graphics-type="2d">2D Graphics</span>
+                </div>
+                    <div class="submenu-body">
+                      <div class="submenu-column graphics-column graphics-column-3d">
+                        <a href="category-page-25.html">Homepage and Navigation</a>
+                        <a href="category-page-26.html">Floor Plans</a>
+                        <a href="category-page-27.html">Equipments</a>
+                        <a href="category-page-28.html">Summary Pages</a>
+                        <a href="category-page-29.html">Dashboards</a>
+                        <a href="category-page-30.html">SLD's</a>
+                </div>
+                      <div class="submenu-column graphics-column graphics-column-2d">
+                        <a href="category-page-31.html">Homepage and Navigation</a>
+                        <a href="category-page-32.html">Floor Plans</a>
+                        <a href="category-page-33.html">Equipments</a>
+                        <a href="category-page-34.html">Summary Pages</a>
+                        <a href="category-page-35.html">Dashboards</a>
+                        <a href="category-page-36.html">SLD's</a>
+              </div>
+            </div>
+                  </div>
+                </li>
+
+                <!-- Education Dropdown -->
+                <li class="dropdown">
+                  <button class="dropdown-btn">Education ▼</button>
+                  <div class="dropdown-content">
+                    <div class="submenu-header">
+                      <span class="submenu-title graphics-title" data-graphics-type="3d">3D Graphics</span>
+                      <span class="submenu-title graphics-title" data-graphics-type="2d">2D Graphics</span>
+                </div>
+                    <div class="submenu-body">
+                      <div class="submenu-column graphics-column graphics-column-3d">
+                        <a href="category-page-37.html">Homepage and Navigation</a>
+                        <a href="category-page-38.html">Floor Plans</a>
+                        <a href="category-page-39.html">Equipments</a>
+                        <a href="category-page-40.html">Summary Pages</a>
+                        <a href="category-page-41.html">Dashboards</a>
+                        <a href="category-page-42.html">SLD's</a>
+                      </div>
+                      <div class="submenu-column graphics-column graphics-column-2d">
+                        <a href="category-page-43.html">Homepage and Navigation</a>
+                        <a href="category-page-44.html">Floor Plans</a>
+                        <a href="category-page-45.html">Equipments</a>
+                        <a href="category-page-46.html">Summary Pages</a>
+                        <a href="category-page-47.html">Dashboards</a>
+                        <a href="category-page-48.html">SLD's</a>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+
+                <!-- Commercial Dropdown -->
+                <li class="dropdown">
+                  <button class="dropdown-btn">Commercial ▼</button>
+                  <div class="dropdown-content">
+                    <div class="submenu-header">
+                      <span class="submenu-title graphics-title" data-graphics-type="3d">3D Graphics</span>
+                      <span class="submenu-title graphics-title" data-graphics-type="2d">2D Graphics</span>
+                    </div>
+                    <div class="submenu-body">
+                      <div class="submenu-column graphics-column graphics-column-3d">
+                        <a href="category-page-49.html">Homepage and Navigation</a>
+                        <a href="category-page-50.html">Floor Plans</a>
+                        <a href="category-page-51.html">Equipments</a>
+                        <a href="category-page-52.html">Summary Pages</a>
+                        <a href="category-page-53.html">Dashboards</a>
+                        <a href="category-page-54.html">SLD's</a>
+                      </div>
+                      <div class="submenu-column graphics-column graphics-column-2d">
+                        <a href="category-page-55.html">Homepage and Navigation</a>
+                        <a href="category-page-56.html">Floor Plans</a>
+                        <a href="category-page-57.html">Equipments</a>
+                        <a href="category-page-58.html">Summary Pages</a>
+                        <a href="category-page-59.html">Dashboards</a>
+                        <a href="category-page-60.html">SLD's</a>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+
+                <!-- BIM Services Dropdown -->
+                <li class="dropdown">
+                  <button class="dropdown-btn">BIM Services ▼</button>
+                  <div class="dropdown-content">
+                    <div class="submenu-body" style="padding: 10px;">
+                      <div class="submenu-column">
+                        <a href="#" class="time-material-link">Time and Material</a>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+
+                <!-- Engineering Services Dropdown -->
+                <li class="dropdown">
+                  <button class="dropdown-btn">Engineering Services ▼</button>
+                  <div class="dropdown-content">
+                    <div class="submenu-body" style="padding: 10px;">
+                      <div class="submenu-column">
+                        <a href="#" class="engg-time-material-link">Time and Material</a>
+                        <a href="#" class="ebo-software-link">EBO Software Engineering</a>
+                        <a href="#" class="graphics-engg-link">Graphics Engineering</a>
+                        <a href="#" class="hardware-engg-link">Hardware Engineering</a>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="products-container" id="productsContainer">
+    <!-- Products for Healthcare/3d/Homepage and Navigation will be loaded dynamically -->
+    <div class="loading">Loading products...</div>
+  </div>
+  
+  <!-- Products management link moved to the top controls -->
+
+  <!-- Modal for product details -->
+  <div class="modal" id="productModal">
+    <div class="modal-content" style="width: 95vw; background: white; display: flex; flex-direction: row; padding: 20px; gap: 30px; margin: 20px auto;">
+      <span class="close-modal" style="position: absolute; right: 20px; top: 20px; font-size: 24px; cursor: pointer; z-index: 1000;">&times;</span>
+      
+      <!-- Left side - Image container (larger) -->
+      <div class="modal-image-container" style="flex: 2.5; background: white; display: flex; align-items: center; justify-content: center; border-radius: 8px; overflow: hidden;">
+        <img class="modal-image" src="" alt="Product Image" style="width: auto; height: auto; max-width: 100%; max-height: 85vh; object-fit: contain; cursor: zoom-in;">
+      </div>
+      
+      <!-- Right side - Product details (smaller) -->
+      <div class="modal-details" style="flex: 1; padding: 15px; display: flex; flex-direction: column; max-width: 400px; min-width: 350px;">
+        <h2 class="modal-title" style="font-size: 20px; margin-bottom: 12px; color: var(--text-dark);"></h2>
+        <p class="modal-description" style="margin-bottom: 15px; line-height: 1.5; color: var(--text-gray); font-size: 14px;"></p>
+        
+        <div class="modal-metadata" style="background: #f8f8f8; padding: 12px; border-radius: 6px; margin-bottom: 15px;">
+          <p style="margin-bottom: 8px; font-size: 14px;"><strong>Category:</strong> <span id="modal-category"></span></p>
+          <p style="margin-bottom: 8px; font-size: 14px;"><strong>Type:</strong> <span id="modal-type"></span></p>
+          <p style="margin-bottom: 8px; font-size: 14px;"><strong>Subcategory:</strong> <span id="modal-subcategory"></span></p>
+        </div>
+        
+        <div class="modal-price" style="margin-bottom: 18px;">
+          <span style="font-size: 14px; font-weight: bold; color: black;">Approx. efforts required to built: </span><br>
+          <span style="font-size: 18px; font-weight: bold; color: #3DCD58;">12hrs</span>
+        </div>
+        
+        <div class="quantity-controls" style="display: flex; align-items: center; gap: 10px; margin-bottom: 18px;">
+          <button class="quantity-btn minus" style="background: var(--primary-green); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 14px;">-</button>
+          <input type="number" class="quantity-input" value="1" min="1" style="width: 50px; text-align: center; padding: 4px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+          <button class="quantity-btn plus" style="background: var(--primary-green); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 14px;">+</button>
+        </div>
+        
+        <button class="add-to-cart-btn" style="background: var(--primary-green); color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; transition: all 0.3s ease;">Add to Cart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add this after the product modal -->
+  <div class="modal" id="cartModal">
+    <div class="modal-content" style="max-width: 1400px; width: 95%; height: auto; min-height: 300px; max-height: 90vh; display: flex; flex-direction: column; padding: 25px;">
+      <span class="close-modal">&times;</span>
+      <h2 class="modal-title" style="margin-bottom: 25px;">Shopping Cart <div class="cart-info-icon" title="Pre-requisites needed to get this deliverable">ⓘ</div></h2>
+      <div class="cart-items" style="flex: 1; overflow-y: auto; margin: 0; padding: 15px; border: 1px solid #eee; border-radius: 8px; background: #f8f8f8;">
+        <!-- Cart items will be dynamically added here -->
+      </div>
+      <div style="margin-top: 25px;">
+        <div class="cart-total" style="background: white; padding: 20px 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+          <span style="font-size: 20px; color: var(--text-dark);">Total Hours:</span>
+          <span id="cart-total-hours" style="font-size: 24px; color: #3DCD58; font-weight: 600;">0</span>
+        </div>
+        <div class="cart-note" style="margin: 15px 0; background: rgba(61, 205, 88, 0.1); padding: 15px; border-radius: 8px;">
+          <p style="margin: 0; color: #666;">Please note: These are indicative hours – may vary based on actual requirement and inputs provided</p>
+        </div>
+        <div class="cart-actions" style="display: flex; gap: 15px; justify-content: flex-end; padding: 15px 0 0 0; border-top: 1px solid #eee;">
+          <button class="clear-cart-btn" style="padding: 12px 25px; min-width: 120px;">Clear Cart</button>
+          <button class="checkout-btn" style="padding: 12px 30px; min-width: 150px;">Checkout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add checkout form modal -->
+  <div class="checkout-form-modal" id="checkoutFormModal">
+    <div class="checkout-form-content">
+      <span class="close-modal">&times;</span>
+      <h2 class="checkout-form-title">Checkout Details</h2>
+      <form id="checkoutForm">
+        <div class="checkout-form-group">
+          <label for="email">Email ID</label>
+          <input type="email" id="email" required>
+        </div>
+        <div class="checkout-form-group">
+          <label for="branch">Branch</label>
+          <input type="text" id="branch" required>
+        </div>
+        <div class="checkout-form-group">
+          <label for="delivery">Estimated Delivery Expected</label>
+          <input type="date" id="delivery" required>
+        </div>
+        <div class="checkout-form-group">
+          <label for="contact">Contact Name</label>
+          <input type="text" id="contact" required>
+        </div>
+        <div class="checkout-form-group">
+          <label for="sharedLink">Input Shared Link</label>
+          <input type="url" id="sharedLink" placeholder="https://..." required>
+        </div>
+        <div class="checkout-form-group">
+          <label for="remarks">Remarks</label>
+          <textarea id="remarks" rows="3" placeholder="Enter any additional comments or requirements"></textarea>
+        </div>
+        <button type="submit" class="checkout-form-submit">
+          <span>Submit Order</span>
+          <div class="loading-spinner" style="display: none;">
+            <div class="spinner"></div>
+          </div>
+        </button>
+      </form>
+      <div class="success-message">
+        <div class="success-icon">✓</div>
+        <div class="success-title">Thank you!</div>
+        <p>Your order has been submitted successfully.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add BIM Services Modal -->
+  <div class="modal" id="bimServicesModal">
+    <div class="modal-content" style="max-width: 500px;">
+      <span class="close-modal">&times;</span>
+      <h2 class="modal-title">BIM Services - Time and Material</h2>
+      <div class="bim-services-content">
+        <p style="margin-bottom: 20px; color: var(--text-dark);">No. of Approx hours</p>
+        <div class="quantity-controls" style="display: flex; align-items: center; justify-content: center; gap: 15px; margin: 20px 0;">
+          <button class="quantity-btn minus" style="background: var(--primary-green); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;">-</button>
+          <input type="number" class="quantity-input" value="1" min="1" style="width: 60px; text-align: center; padding: 5px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px;">
+          <button class="quantity-btn plus" style="background: var(--primary-green); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;">+</button>
+        </div>
+        <div class="bim-services-actions">
+          <button class="add-to-cart-btn" style="background: var(--primary-green); color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; transition: all 0.3s ease;">
+                Add to Cart
+              </button>
+            </div>
+              </div>
+                </div>
+              </div>
+
+  <!-- Add Engineering Services Modal -->
+  <div class="modal" id="enggServicesModal">
+    <div class="modal-content" style="max-width: 500px;">
+      <span class="close-modal">&times;</span>
+      <h2 class="modal-title">Engineering Services - Time and Material</h2>
+      <div class="bim-services-content">
+        <p style="margin-bottom: 20px; color: var(--text-dark);">No. of Approx hours</p>
+        <div class="quantity-controls" style="display: flex; align-items: center; justify-content: center; gap: 15px; margin: 20px 0;">
+          <button class="quantity-btn minus" style="background: var(--primary-green); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;">-</button>
+          <input type="number" class="quantity-input" value="1" min="1" style="width: 60px; text-align: center; padding: 5px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px;">
+          <button class="quantity-btn plus" style="background: var(--primary-green); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;">+</button>
+        </div>
+        <div class="bim-services-actions">
+          <button class="add-to-cart-btn" style="background: var(--primary-green); color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; transition: all 0.3s ease;">
+                Add to Cart
+              </button>
+        </div>
+      </div>
+    </div>
+            </div>
+
+  <!-- Add EBO Software Engineering Modal -->
+  <div class="modal" id="eboSoftwareModal">
+    <div class="modal-content" style="max-width: 500px;">
+      <span class="close-modal">&times;</span>
+      <h2 class="modal-title">EBO Software Engineering</h2>
+      <div class="bim-services-content">
+        <p style="margin-bottom: 20px; color: var(--text-dark);">No. of Approx hours</p>
+        <div class="quantity-controls" style="display: flex; align-items: center; justify-content: center; gap: 15px; margin: 20px 0;">
+          <button class="quantity-btn minus" style="background: var(--primary-green); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;">-</button>
+          <input type="number" class="quantity-input" value="1" min="1" style="width: 60px; text-align: center; padding: 5px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px;">
+          <button class="quantity-btn plus" style="background: var(--primary-green); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;">+</button>
+        </div>
+        <div class="bim-services-actions">
+          <button class="add-to-cart-btn" style="background: var(--primary-green); color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; transition: all 0.3s ease;">
+            Add to Cart
+          </button>
+                </div>
+              </div>
+    </div>
+  </div>
+
+  <!-- Add Graphics Engineering Modal -->
+  <div class="modal" id="graphicsEnggModal">
+    <div class="modal-content" style="max-width: 500px;">
+      <span class="close-modal">&times;</span>
+      <h2 class="modal-title">Graphics Engineering</h2>
+      <div class="bim-services-content">
+        <p style="margin-bottom: 20px; color: var(--text-dark);">No. of Approx hours</p>
+        <div class="quantity-controls" style="display: flex; align-items: center; justify-content: center; gap: 15px; margin: 20px 0;">
+          <button class="quantity-btn minus" style="background: var(--primary-green); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;">-</button>
+          <input type="number" class="quantity-input" value="1" min="1" style="width: 60px; text-align: center; padding: 5px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px;">
+          <button class="quantity-btn plus" style="background: var(--primary-green); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;">+</button>
+        </div>
+        <div class="bim-services-actions">
+          <button class="add-to-cart-btn" style="background: var(--primary-green); color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; transition: all 0.3s ease;">
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+  <!-- Add Hardware Engineering Modal -->
+  <div class="modal" id="hardwareEnggModal">
+    <div class="modal-content" style="max-width: 500px;">
+      <span class="close-modal">&times;</span>
+      <h2 class="modal-title">Hardware Engineering</h2>
+      <div class="bim-services-content">
+        <p style="margin-bottom: 20px; color: var(--text-dark);">No. of Approx hours</p>
+        <div class="quantity-controls" style="display: flex; align-items: center; justify-content: center; gap: 15px; margin: 20px 0;">
+          <button class="quantity-btn minus" style="background: var(--primary-green); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;">-</button>
+          <input type="number" class="quantity-input" value="1" min="1" style="width: 60px; text-align: center; padding: 5px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px;">
+          <button class="quantity-btn plus" style="background: var(--primary-green); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;">+</button>
+        </div>
+        <div class="bim-services-actions">
+          <button class="add-to-cart-btn" style="background: var(--primary-green); color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; transition: all 0.3s ease;">
+            Add to Cart
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Engineering Services Time and Material Modal -->
+  <div class="modal" id="enggTimeMaterialModal">
+    <div class="modal-content" style="max-width: 500px;">
+      <span class="close-modal">&times;</span>
+      <h2 class="modal-title">Engineering Services - Time and Material</h2>
+      <div class="bim-services-content">
+        <p style="margin-bottom: 20px; color: var(--text-dark);">No. of Approx hours</p>
+        <div class="quantity-controls" style="display: flex; align-items: center; justify-content: center; gap: 15px; margin: 20px 0;">
+          <button class="quantity-btn minus" style="background: var(--primary-green); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;">-</button>
+          <input type="number" class="quantity-input" value="1" min="1" style="width: 60px; text-align: center; padding: 5px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px;">
+          <button class="quantity-btn plus" style="background: var(--primary-green); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;">+</button>
+        </div>
+        <div class="bim-services-actions">
+          <button class="add-to-cart-btn" style="background: var(--primary-green); color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; transition: all 0.3s ease;">
+            Add to Cart
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fullscreen Image Modal -->
+  <div id="fullscreenModal" class="fullscreen-modal">
+    <div class="fullscreen-modal-content">
+      <span class="fullscreen-close" title="Exit Fullscreen">&times;</span>
+      <img id="fullscreenImage" src="" alt="Fullscreen Image">
+    </div>
+  </div>
+
+  <script src="js/product-display.js"></script>
+  <script src="js/product-controls.js"></script>
+  <script src="js/script.js"></script>
+  <script>
+    // Initialize cart from localStorage
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    // Update cart count display
+    function updateCartCount() {
+      const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
+      const headerCartCountElement = document.getElementById('header-cart-count');
+      if (headerCartCountElement) {
+        headerCartCountElement.textContent = cartCount;
+        // Always show the count, even when it's 0
+        headerCartCountElement.style.display = 'flex';
+      }
+    }
+
+    // Call updateCartCount when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      updateCartCount();
+      
+      const graphicsTitles = document.querySelectorAll('.graphics-title');
+      const graphicsColumns = document.querySelectorAll('.graphics-column');
+
+      // Hide all columns initially
+      graphicsColumns.forEach(column => {
+        column.style.display = 'none';
+      });
+
+      graphicsTitles.forEach(title => {
+        title.addEventListener('mouseenter', function() {
+          const graphicsType = this.dataset.graphicsType;
+          // Hide all columns first
+          graphicsColumns.forEach(column => {
+            column.style.display = 'none';
+          });
+          // Show only the selected column
+          const selectedColumn = this.closest('.dropdown-content').querySelector(`.graphics-column-${graphicsType}`);
+          if (selectedColumn) {
+            selectedColumn.style.display = 'flex';
+          }
+        });
+      });
+
+      // Handle mouseleave on the dropdown content
+      document.querySelectorAll('.dropdown-content').forEach(dropdownContent => {
+        dropdownContent.addEventListener('mouseleave', function() {
+          graphicsColumns.forEach(column => {
+            column.style.display = 'none';
+      });
+    });
+      });
+    });
+
+    // Function to create a product card with proper image handling
+    function createProductCard(product) {
+      if (!product) {
+        console.warn('No product data provided to createProductCard');
+        return null;
+      }
+
+      const card = document.createElement('div');
+      card.className = 'product-card';
+
+      // Create image container for better image display
+      const imageContainer = document.createElement('div'); 
+      imageContainer.className = 'product-image-container';
+
+      const img = document.createElement('img');
+      img.className = 'product-image';
+
+      // Get image path from product object, with fallbacks
+      const imagePath = product.imageUrl || product.image_path || product.ImageUrl || product.ImagePath;
+      if (!imagePath || typeof imagePath === 'object') {
+        console.warn('Invalid image path for product:', product);
+        return null;
+      }
+
+      // Set initial opacity to 0 for fade-in effect
+      img.style.opacity = '0';
+      img.src = imagePath;
+      img.alt = product.title || product.Title || 'Product Image';
+
+      // Add loading transition effect
+      img.onload = function() {
+        img.style.opacity = '1';
+      };
+
+      img.onerror = function() {
+        console.error('Failed to load image:', imagePath);
+        card.remove(); // Remove card if image fails to load
+      };
+
+      const titleElement = document.createElement('div');
+      titleElement.className = 'product-title';
+      titleElement.textContent = product.title || product.Title || 'Product';
+
+      imageContainer.appendChild(img);
+      card.appendChild(imageContainer);
+      card.appendChild(titleElement);
+
+      // Add click handler to show modal
+      card.addEventListener('click', () => {
+        showProductModal(product);
+      });
+
+      return card;
+    }
+
+    // Load products based on category, type, and subcategory
+    // Function maintained for backward compatibility with any existing code
+    function loadPage() {
+      const category = "Healthcare";
+      const type = "3d";
+      const subcategory = "Homepage and Navigation";
+      
+      document.title = `GEC - ${category} - ${type.toUpperCase()} - ${subcategory}`;
+      loadFilteredProducts('#productsContainer', category, type, subcategory);
+      
+      console.log(`Loading products for ${category}/${type}/${subcategory}`);
+    }
+    
+    // Legacy function maintained for backward compatibility 
+    function loadProducts() {
+      loadPage();
+    }
+
+    // Function to show product modal - Modified to receive full product data
+    function showProductModal(productInfo) { 
+      const modal = document.getElementById('productModal');
+      modal.querySelector('.modal-image').src = productInfo.imageUrl || productInfo.image_path || productInfo.image || 'images/placeholder.png';
+      modal.querySelector('.modal-image').alt = productInfo.Title || productInfo.title || 'Product';
+      modal.querySelector('.modal-title').textContent = productInfo.Title || productInfo.title || 'Product';
+      modal.querySelector('.modal-description').textContent = productInfo.Description || productInfo.description || '';
+      modal.querySelector('.modal-price').innerHTML = `<span style="font-size: 14px; font-weight: bold; color: black;">Approx. efforts required to built: </span><br><span style="font-size: 18px; font-weight: bold; color: #3DCD58;">${productInfo.Hours || productInfo.hours || 12}hrs</span>`;
+      
+      // Update metadata fields
+      const categoryText = document.getElementById('modal-category');
+      const typeText = document.getElementById('modal-type');
+      const subcategoryText = document.getElementById('modal-subcategory');
+      
+      if (categoryText) categoryText.textContent = productInfo.Category || productInfo.category || 'Healthcare';
+      if (typeText) typeText.textContent = productInfo.Type || productInfo.type || '3d';
+      if (subcategoryText) subcategoryText.textContent = productInfo.Subcategory || productInfo.subcategory || 'Homepage and Navigation';
+      
+      // Store the full product data for cart
+      modal.dataset.product = JSON.stringify({
+          id: productInfo.Id || productInfo.id || Date.now().toString(),
+          title: productInfo.Title || productInfo.title || 'Product',
+          image_path: productInfo.imageUrl || productInfo.image_path || productInfo.image || 'images/placeholder.png',
+          hours: productInfo.Hours || productInfo.hours || 12,
+          category: productInfo.Category || productInfo.category || 'Healthcare',
+          type: productInfo.Type || productInfo.type || '3d',
+          subcategory: productInfo.Subcategory || productInfo.subcategory || 'Homepage and Navigation',
+          description: productInfo.Description || productInfo.description || ''
+      });
+      
+      modal.querySelector('.quantity-input').value = 1; // Reset quantity
+      modal.style.display = 'flex';
+    }
+
+    // Close modal when clicking the close button - REMAINS THE SAME
+    document.querySelector('#productModal .close-modal').addEventListener('click', () => {
+      document.getElementById('productModal').style.display = 'none';
+    });
+
+    // Close modal when clicking outside - REMAINS THE SAME
+    window.addEventListener('click', (event) => {
+      const modal = document.getElementById('productModal');
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+
+    // Quantity controls
+    document.querySelectorAll('.quantity-btn').forEach(button => {
+      button.addEventListener('click', () => {
+        const input = button.parentElement.querySelector('.quantity-input');
+        if (button.classList.contains('minus')) {
+          input.value = Math.max(1, parseInt(input.value) - 1);
+        } else {
+          input.value = parseInt(input.value) + 1;
+        }
+      });
+    });
+
+    // Add to cart functionality
+    document.querySelector('.add-to-cart-btn').addEventListener('click', () => {
+      const modal = document.getElementById('productModal');
+      const title = modal.querySelector('.modal-title').textContent;
+      const quantity = parseInt(modal.querySelector('.quantity-input').value);
+      const productData = JSON.parse(modal.dataset.product);
+      
+      // Get metadata from modal and use it with fallbacks to productData
+      const modalCategory = document.getElementById('modal-category');
+      const modalType = document.getElementById('modal-type');
+      const modalSubcategory = document.getElementById('modal-subcategory');
+      
+      const category = modalCategory ? modalCategory.textContent : (productData.category || '');
+      const type = modalType ? modalType.textContent : (productData.type || '');
+      const subcategory = modalSubcategory ? modalSubcategory.textContent : (productData.subcategory || '');
+      
+      // Add to cart
+      const existingItem = cart.find(item => item.item === title);
+      if (existingItem) {
+        existingItem.quantity += quantity;
+      } else {
+        cart.push({ 
+          id: productData.id || Date.now().toString(),
+          item: title, 
+          price: productData.hours || 12, 
+          quantity,
+          image_path: productData.image_path || productData.imageUrl || 'images/placeholder.png',
+          category: category,
+          type: type,
+          subcategory: subcategory,
+          description: productData.description || ''
+        });
+      }
+
+      // Save to localStorage
+      localStorage.setItem('cart', JSON.stringify(cart));
+
+
+      // Update cart count
+        updateCartCount();
+
+      // Close modal
+      modal.style.display = 'none';
+
+      // Show success message
+      const successMessage = document.createElement('div');
+      successMessage.className = 'success-message';
+      successMessage.textContent = `Added ${quantity} ${title}(s) to cart!`;
+      document.body.appendChild(successMessage);
+      
+      setTimeout(() => {
+        successMessage.remove();
+      }, 3000);
+    });
+
+    // Main initialization when the DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      // Define filter values based on current page
+      const category = "Healthcare";
+      const type = "3d";
+      const subcategory = "Homepage and Navigation";
+      
+      // Display page title
+      document.title = `GEC - ${category} - ${type.toUpperCase()} - ${subcategory}`;
+      
+      // Load products immediately without controls
+      loadFilteredProducts('#productsContainer', category, type, subcategory);
+      
+      // Setup modal interactions
+      document.querySelectorAll('.modal .close-modal').forEach(closeBtn => {
+          closeBtn.addEventListener('click', function() {
+              this.closest('.modal').style.display = 'none';
+          });
+      });
+      
+      // Close modal when clicking outside
+      window.addEventListener('click', function(event) {
+          document.querySelectorAll('.modal').forEach(modal => {
+              if (event.target === modal) {
+
+                  modal.style.display = 'none';
+              }
+          });
+      });
+      
+      console.log('Category page 1 initialized with filters:', { category, type, subcategory });
+    });
+
+    // Add styles for loading and error states
+    const style = document.createElement('style');
+    style.textContent = `
+      .loading-placeholder {
+        text-align: center;
+        padding: 20px;
+        color: var(--text-dark);
+      }
+      .no-products {
+        text-align: center;
+        padding: 20px;
+        color: var(--text-dark);
+        grid-column: 1 / -1;
+      }
+      .error {
+        text-align: center;
+        padding: 20px;
+        color: red;
+        grid-column: 1 / -1;
+      }
+
+      /* Product Modal Styles */
+      #productModal .modal-content {
+        width: 95%;
+        max-width: 1400px;
+      }
+
+      /* Cart Item Styles */
+      .cart-item {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+        gap: 30px;
+        min-height: 200px;
+      }
+      
+      .cart-item-image {
+        width: 200px;
+        height: 200px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+      
+      .cart-item-image img {
+        width: 200px;
+        height: 200px;
+        object-fit: contain;
+        border-radius: 4px;
+      }
+      
+      .cart-item-details {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding-right: 15px;
+        justify-content: center;
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Function to update cart modal
+    function updateCartModal() {
+      const cartItemsContainer = document.querySelector('.cart-items');
+      const cartTotalHours = document.getElementById('cart-total-hours');
+      
+      // Clear existing items
+      cartItemsContainer.innerHTML = '';
+      
+      if (cart.length === 0) {
+        cartItemsContainer.innerHTML = '<div class="empty-cart">Your cart is empty</div>';
+        cartTotalHours.textContent = '0';
+        return;
+      }
+      
+      // Calculate total hours
+      let totalHours = 0;
+      
+      // Add each item to the cart modal
+      cart.forEach((item, index) => {
+        const cartItem = document.createElement('div');
+        cartItem.className = 'cart-item';
+        
+        // Get category path components, fallback to empty string if undefined
+        const category = item.category || '';
+        const type = item.type || '';
+        const subcategory = item.subcategory || '';
+        
+        cartItem.innerHTML = `
+          <div class="cart-item-image">
+            <img src="${item.image_path || 'images/placeholder.png'}" alt="${item.item}" onerror="this.src='images/placeholder.png'">
+          </div>
+          <div class="cart-item-details">
+            <span class="cart-item-title">${item.item}</span>
+            <span class="cart-item-path">${category}${type ? '/' + type : ''}${subcategory ? '/' + subcategory : ''}</span>
+            <span class="cart-item-price">${item.price}hrs</span>
+          </div>
+          <div class="cart-item-quantity">
+            <button class="quantity-btn minus" data-index="${index}">-</button>
+            <span class="quantity">${item.quantity}</span>
+            <button class="quantity-btn plus" data-index="${index}">+</button>
+          </div>
+          <button class="remove-item" data-index="${index}">&times;</button>
+        `;
+        cartItemsContainer.appendChild(cartItem);
+        
+        totalHours += item.price * item.quantity;
+      });
+      
+      cartTotalHours.textContent = totalHours;
+    }
+
+    // Function to show cart modal
+    function showCartModal() {
+      updateCartModal();
+      document.getElementById('cartModal').style.display = 'flex';
+    }
+
+    // Update cart icon click handler
+    document.querySelector('.icon-link[href="cart.html"]').addEventListener('click', function(e) {
+      e.preventDefault();
+      showCartModal();
+    });
+
+    // Close cart modal when clicking the close button
+    document.querySelector('#cartModal .close-modal').addEventListener('click', () => {
+      document.getElementById('cartModal').style.display = 'none';
+    });
+
+    // Close cart modal when clicking outside
+    window.addEventListener('click', (event) => {
+      const modal = document.getElementById('cartModal');
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+
+    // Handle cart item quantity changes
+
+    document.querySelector('.cart-items').addEventListener('click', (e) => {
+      if (e.target.classList.contains('quantity-btn')) {
+        const index = parseInt(e.target.dataset.index);
+        const item = cart[index];
+        
+        if (e.target.classList.contains('minus')) {
+          if (item.quantity > 1) {
+            item.quantity--;
+          } else {
+            cart.splice(index, 1);
+          }
+        } else {
+          item.quantity++;
+        }
+
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartCount();
+        updateCartModal();
+      }
+    });
+
+    // Handle item removal
+    document.querySelector('.cart-items').addEventListener('click', (e) => {
+      if (e.target.classList.contains('remove-item')) {
+        const index = parseInt(e.target.dataset.index);
+        cart.splice(index, 1);
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartCount();
+        updateCartModal();
+      }
+    });
+
+    // Handle clear cart
+    document.querySelector('.clear-cart-btn').addEventListener('click', () => {
+      cart = [];
+      localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCount();
+      updateCartModal();
+    });
+
+    // Add contact dropdown behavior
+    const contactIcon = document.querySelector('.icon-link img[alt="Contact Us"]');
+    const contactDropdown = document.querySelector('.contact-dropdown');
+    let dropdownTimeout;
+
+    contactIcon.addEventListener('mouseenter', () => {
+      clearTimeout(dropdownTimeout);
+      contactDropdown.style.display = 'block';
+      setTimeout(() => {
+        contactDropdown.style.opacity = '1';
+      }, 10);
+    });
+
+    contactIcon.addEventListener('mouseleave', () => {
+      dropdownTimeout = setTimeout(() => {
+        contactDropdown.style.opacity = '0';
+        setTimeout(() => {
+          contactDropdown.style.display = 'none';
+        }, 500);
+      }, 1000); // 1 second delay before starting fade
+    });
+
+    contactDropdown.addEventListener('mouseenter', () => {
+      clearTimeout(dropdownTimeout);
+      contactDropdown.style.opacity = '1';
+    });
+
+    contactDropdown.addEventListener('mouseleave', () => {
+      dropdownTimeout = setTimeout(() => {
+        contactDropdown.style.opacity = '0';
+        setTimeout(() => {
+          contactDropdown.style.display = 'none';
+        }, 500);
+      }, 1000); // 1 second delay before starting fade
+    });
+
+    // Add checkout form functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const checkoutBtn = document.querySelector('.checkout-btn');
+      const checkoutFormModal = document.getElementById('checkoutFormModal');
+      const checkoutForm = document.getElementById('checkoutForm');
+      const successMessage = document.querySelector('.success-message');
+      const cartModal = document.getElementById('cartModal');
+
+      checkoutBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        checkoutFormModal.classList.add('show');
+        setTimeout(() => {
+          checkoutForm.querySelector('input').focus();
+        }, 300);
+      });
+
+      checkoutFormModal.querySelector('.close-modal').addEventListener('click', () => {
+        checkoutFormModal.classList.remove('show');
+      });
+
+      checkoutFormModal.addEventListener('click', (e) => {
+        if (e.target === checkoutFormModal) {
+          checkoutFormModal.classList.remove('show');
+        }
+      });
+
+      // Close with Escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && checkoutFormModal.classList.contains('show')) {
+          checkoutFormModal.classList.remove('show');
+        }
+      });
+
+      checkoutForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Show loading spinner
+        const loadingSpinner = document.querySelector('.loading-spinner');
+        loadingSpinner.style.display = 'flex';
+        checkoutForm.style.display = 'none';
+
+        // Get form data and include current date/time
+        const formData = {
+          customerEmail: document.getElementById('email').value,
+          customerName: document.getElementById('contact').value,
+          branch: document.getElementById('branch').value,
+          deliveryDate: document.getElementById('delivery').value,
+          sharedLink: document.getElementById('sharedLink').value,
+          remarks: document.getElementById('remarks').value,
+          totalHours: cart.reduce((total, item) => total + (item.price * item.quantity), 0),
+          orderDate: new Date().toISOString(),
+          items: cart.map(item => ({
+            productId: item.id,
+            quantity: item.quantity,
+            hours: item.price,
+            totalHours: item.price * item.quantity,
+            category: item.category,
+            type: item.type,
+            subcategory: item.subcategory,
+            title: item.item
+          }))
+        };
+
+        try {
+          // Send order to server
+          const response = await fetch('http://localhost:3000/api/orders', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to submit order');
+          }
+
+          // Show success message and update UI
+          successMessage.style.display = 'block';
+          loadingSpinner.style.display = 'none';
+
+          // Clear cart after successful checkout
+          cart = [];
+          localStorage.setItem('cart', JSON.stringify(cart));
+          updateCartCount();
+
+          // Show thank you message and reset UI
+          setTimeout(() => {
+            successMessage.style.display = 'none';
+            checkoutForm.style.display = 'block';
+            checkoutForm.reset();
+            checkoutFormModal.classList.remove('show');
+            cartModal.style.display = 'none';
+            
+            // Show a success toast message
+            const toast = document.createElement('div');
+            toast.className = 'success-toast';
+            toast.innerHTML = `
+              <div class="success-icon">✓</div>
+              <div>Order submitted successfully! Thank you for your order.</div>
+            `;
+            document.body.appendChild(toast);
+
+            // Remove toast after 3 seconds
+            setTimeout(() => {
+              toast.remove();
+            }, 3000);
+          }, 3000);
+        } catch (error) {
+          console.error('Error submitting order:', error);
+          loadingSpinner.style.display = 'none';
+          checkoutForm.style.display = 'block';
+          alert('Failed to process your order. Please try again.');
+        }
+      });
+    });
+
+    // Add BIM Services Modal functionality
+    const timeMaterialLink = document.querySelector('.time-material-link');
+    const bimServicesModal = document.getElementById('bimServicesModal');
+    const addToCartBtn = bimServicesModal.querySelector('.add-to-cart-btn');
+    const quantityInput = bimServicesModal.querySelector('.quantity-input');
+    const minusBtn = bimServicesModal.querySelector('.quantity-btn.minus');
+    const plusBtn = bimServicesModal.querySelector('.quantity-btn.plus');
+
+    timeMaterialLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      bimServicesModal.style.display = 'flex';
+    });
+
+    bimServicesModal.querySelector('.close-modal').addEventListener('click', () => {
+      bimServicesModal.style.display = 'none';
+    });
+
+    bimServicesModal.addEventListener('click', (e) => {
+      if (e.target === bimServicesModal) {
+        bimServicesModal.style.display = 'none';
+      }
+    });
+
+    // Handle quantity changes
+    minusBtn.onclick = function() {
+      const currentQuantity = parseInt(quantityInput.value);
+      if (currentQuantity > 1) {
+        quantityInput.value = currentQuantity - 1;
+      }
+    };
+
+    plusBtn.onclick = function() {
+      const currentQuantity = parseInt(quantityInput.value);
+      quantityInput.value = currentQuantity + 1;
+    };
+
+    // Handle manual input
+    quantityInput.onchange = function() {
+      const value = parseInt(this.value);
+      if (isNaN(value) || value < 1) {
+        this.value = 1;
+      }
+    };
+
+    addToCartBtn.onclick = function() {
+      const quantity = parseInt(quantityInput.value);
+      const bimService = {
+        id: 'bim-time-material',
+        item: 'BIM Services - Time and Material',
+        price: 1,
+        quantity: quantity
+      };
+      
+      const existingItem = cart.find(item => item.id === bimService.id);
+      if (existingItem) {
+        existingItem.quantity = quantity;
+      } else {
+        cart.push(bimService);
+      }
+      
+      localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCount();
+      bimServicesModal.style.display = 'none';
+      quantityInput.value = '1';
+    };
+
+    // Add EBO Software Engineering Modal functionality
+    const eboSoftwareLink = document.querySelector('.ebo-software-link');
+    const eboSoftwareModal = document.getElementById('eboSoftwareModal');
+    const eboAddToCartBtn = eboSoftwareModal.querySelector('.add-to-cart-btn');
+    const eboQuantityInput = eboSoftwareModal.querySelector('.quantity-input');
+    const eboMinusBtn = eboSoftwareModal.querySelector('.quantity-btn.minus');
+    const eboPlusBtn = eboSoftwareModal.querySelector('.quantity-btn.plus');
+
+    eboSoftwareLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      eboSoftwareModal.style.display = 'flex';
+    });
+
+    eboSoftwareModal.querySelector('.close-modal').addEventListener('click', () => {
+      eboSoftwareModal.style.display = 'none';
+    });
+
+    eboSoftwareModal.addEventListener('click', (e) => {
+      if (e.target === eboSoftwareModal) {
+        eboSoftwareModal.style.display = 'none';
+      }
+    });
+
+    eboMinusBtn.onclick = function() {
+      const currentQuantity = parseInt(eboQuantityInput.value);
+      if (currentQuantity > 1) {
+        eboQuantityInput.value = currentQuantity - 1;
+      }
+    };
+
+    eboPlusBtn.onclick = function() {
+      const currentQuantity = parseInt(eboQuantityInput.value);
+      eboQuantityInput.value = currentQuantity + 1;
+    };
+
+    eboQuantityInput.onchange = function() {
+      const value = parseInt(this.value);
+      if (isNaN(value) || value < 1) {
+        this.value = 1;
+      }
+    };
+
+    eboAddToCartBtn.onclick = function() {
+      const quantity = parseInt(eboQuantityInput.value);
+      const eboService = {
+        id: 'ebo-software',
+        item: 'EBO Software Engineering',
+        price: 1,
+        quantity: quantity
+      };
+      
+      const existingItem = cart.find(item => item.id === eboService.id);
+      if (existingItem) {
+        existingItem.quantity = quantity;
+      } else {
+        cart.push(eboService);
+      }
+      
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCartCount();
+      eboSoftwareModal.style.display = 'none';
+      eboQuantityInput.value = '1';
+    };
+
+    // Add Graphics Engineering Modal functionality
+    const graphicsEnggLink = document.querySelector('.graphics-engg-link');
+    const graphicsEnggModal = document.getElementById('graphicsEnggModal');
+    const graphicsAddToCartBtn = graphicsEnggModal.querySelector('.add-to-cart-btn');
+    const graphicsQuantityInput = graphicsEnggModal.querySelector('.quantity-input');
+    const graphicsMinusBtn = graphicsEnggModal.querySelector('.quantity-btn.minus');
+    const graphicsPlusBtn = graphicsEnggModal.querySelector('.quantity-btn.plus');
+
+    graphicsEnggLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      graphicsEnggModal.style.display = 'flex';
+    });
+
+    graphicsEnggModal.querySelector('.close-modal').addEventListener('click', () => {
+      graphicsEnggModal.style.display = 'none';
+    });
+
+    graphicsEnggModal.addEventListener('click', (e) => {
+      if (e.target === graphicsEnggModal) {
+        graphicsEnggModal.style.display = 'none';
+      }
+    });
+
+    graphicsMinusBtn.onclick = function() {
+      const currentQuantity = parseInt(graphicsQuantityInput.value);
+      if (currentQuantity > 1) {
+        graphicsQuantityInput.value = currentQuantity - 1;
+      }
+    };
+
+    graphicsPlusBtn.onclick = function() {
+      const currentQuantity = parseInt(graphicsQuantityInput.value);
+      graphicsQuantityInput.value = currentQuantity + 1;
+    };
+
+    graphicsQuantityInput.onchange = function() {
+      const value = parseInt(this.value);
+      if (isNaN(value) || value < 1) {
+        this.value = 1;
+      }
+    };
+
+    graphicsAddToCartBtn.onclick = function() {
+      const quantity = parseInt(graphicsQuantityInput.value);
+      const graphicsService = {
+        id: 'graphics-engg',
+        item: 'Graphics Engineering',
+        price: 1,
+        quantity: quantity
+      };
+      
+      const existingItem = cart.find(item => item.id === graphicsService.id);
+      if (existingItem) {
+        existingItem.quantity = quantity;
+      } else {
+        cart.push(graphicsService);
+      }
+      
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCartCount();
+      graphicsEnggModal.style.display = 'none';
+      graphicsQuantityInput.value = '1';
+    };
+
+    // Add Hardware Engineering Modal functionality
+    const hardwareEnggLink = document.querySelector('.hardware-engg-link');
+    const hardwareEnggModal = document.getElementById('hardwareEnggModal');
+    const hardwareAddToCartBtn = hardwareEnggModal.querySelector('.add-to-cart-btn');
+    const hardwareQuantityInput = hardwareEnggModal.querySelector('.quantity-input');
+    const hardwareMinusBtn = hardwareEnggModal.querySelector('.quantity-btn.minus');
+    const hardwarePlusBtn = hardwareEnggModal.querySelector('.quantity-btn.plus');
+
+    hardwareEnggLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      hardwareEnggModal.style.display = 'flex';
+    });
+
+    hardwareEnggModal.querySelector('.close-modal').addEventListener('click', () => {
+      hardwareEnggModal.style.display = 'none';
+    });
+
+    hardwareEnggModal.addEventListener('click', (e) => {
+      if (e.target === hardwareEnggModal) {
+        hardwareEnggModal.style.display = 'none';
+      }
+    });
+
+    hardwareMinusBtn.onclick = function() {
+      const currentQuantity = parseInt(hardwareQuantityInput.value);
+      if (currentQuantity > 1) {
+        hardwareQuantityInput.value = currentQuantity - 1;
+      }
+    };
+
+    hardwarePlusBtn.onclick = function() {
+      const currentQuantity = parseInt(hardwareQuantityInput.value);
+      hardwareQuantityInput.value = currentQuantity + 1;
+    };
+
+    hardwareQuantityInput.onchange = function() {
+      const value = parseInt(this.value);
+      if (isNaN(value) || value < 1) {
+        this.value = 1;
+      }
+    };
+
+    hardwareAddToCartBtn.onclick = function() {
+      const quantity = parseInt(hardwareQuantityInput.value);
+      const hardwareService = {
+        id: 'hardware-engg',
+        item: 'Hardware Engineering',
+        price: 1,
+        quantity: quantity
+      };
+      
+      const existingItem = cart.find(item => item.id === hardwareService.id);
+      if (existingItem) {
+        existingItem.quantity = quantity;
+      } else {
+        cart.push(hardwareService);
+      }
+      
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCartCount();
+      hardwareEnggModal.style.display = 'none';
+      hardwareQuantityInput.value = '1';
+    };
+
+    // Add Engineering Services Time and Material Modal functionality
+    const enggTimeMaterialLink = document.querySelector('.engg-time-material-link');
+    const enggTimeMaterialModal = document.getElementById('enggTimeMaterialModal');
+    const enggTimeMaterialAddToCartBtn = enggTimeMaterialModal.querySelector('.add-to-cart-btn');
+    const enggTimeMaterialQuantityInput = enggTimeMaterialModal.querySelector('.quantity-input');
+    const enggTimeMaterialMinusBtn = enggTimeMaterialModal.querySelector('.quantity-btn.minus');
+    const enggTimeMaterialPlusBtn = enggTimeMaterialModal.querySelector('.quantity-btn.plus');
+
+    enggTimeMaterialLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      enggTimeMaterialModal.style.display = 'flex';
+    });
+
+    enggTimeMaterialModal.querySelector('.close-modal').addEventListener('click', () => {
+      enggTimeMaterialModal.style.display = 'none';
+    });
+
+    enggTimeMaterialModal.addEventListener('click', (e) => {
+      if (e.target === enggTimeMaterialModal) {
+        enggTimeMaterialModal.style.display = 'none';
+      }
+    });
+
+    enggTimeMaterialMinusBtn.onclick = function() {
+      const currentQuantity = parseInt(enggTimeMaterialQuantityInput.value);
+      if (currentQuantity > 1) {
+        enggTimeMaterialQuantityInput.value = currentQuantity - 1;
+      }
+    };
+
+    enggTimeMaterialPlusBtn.onclick = function() {
+      const currentQuantity = parseInt(enggTimeMaterialQuantityInput.value);
+      enggTimeMaterialQuantityInput.value = currentQuantity + 1;
+    };
+
+    enggTimeMaterialQuantityInput.onchange = function() {
+      const value = parseInt(this.value);
+      if (isNaN(value) || value < 1) {
+        this.value = 1;
+      }
+    };
+
+    enggTimeMaterialAddToCartBtn.onclick = function() {
+      const quantity = parseInt(enggTimeMaterialQuantityInput.value);
+      const enggTimeMaterialService = {
+        id: 'engg-time-material',
+        item: 'Engineering Services - Time and Material',
+        price: 1,
+        quantity: quantity
+      };
+      
+      const existingItem = cart.find(item => item.id === enggTimeMaterialService.id);
+      if (existingItem) {
+        existingItem.quantity = quantity;
+      } else {
+        cart.push(enggTimeMaterialService);
+      }
+      
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCartCount();
+      enggTimeMaterialModal.style.display = 'none';
+      enggTimeMaterialQuantityInput.value = '1';
+    };
+
+    // Search functionality
+    const searchInput = document.querySelector('.search-box');
+    const searchResults = document.querySelector('.search-results');
+    let debounceTimer;
+    let currentPage = 1;
+    const resultsPerPage = 5;
+    let allSearchResults = [];
+
+    searchInput.addEventListener('input', function(e) {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(async () => {
+        const searchTerm = e.target.value.trim();
+        
+        if (searchTerm.length < 2) {
+          searchResults.classList.remove('active');
+          return;
+        }
+
+        try {
+          const response = await fetch('http://localhost:3000/api/products');
+          const products = await response.json();
+          
+          // Filter products based on search term
+          allSearchResults = products.filter(product => 
+            product.Title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            product.Description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            product.Category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            product.Type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            product.Subcategory?.toLowerCase().includes(searchTerm.toLowerCase())
+          );
+
+          displaySearchResults();
+        } catch (error) {
+          console.error('Error fetching search results:', error);
+        }
+      }, 300);
+    });
+
+    function displaySearchResults() {
+      if (allSearchResults.length === 0) {
+        searchResults.innerHTML = '<div class="no-results">No results found</div>';
+        searchResults.classList.add('active');
+        return;
+      }
+
+      const startIndex = (currentPage - 1) * resultsPerPage;
+      const endIndex = startIndex + resultsPerPage;
+      const paginatedResults = allSearchResults.slice(startIndex, endIndex);
+
+      let html = '';
+      paginatedResults.forEach(product => {
+        html += `
+          <div class="search-result-item" onclick="handleSearchResultClick(this)" data-product='${JSON.stringify(product)}'>
+            <img class="search-result-image" src="${product.imageUrl || product.image_path || 'images/placeholder.png'}" alt="${product.Title || 'Product image'}">
+            <div class="search-result-info">
+              <div class="search-result-title">${product.Title || 'Product'}</div>
+              <div class="search-result-folder">${product.Category || product.category} > ${product.Type || product.type} > ${product.Subcategory || product.subcategory}</div>
+            </div>
+          </div>
+        `;
+      });
+
+      if (allSearchResults.length > endIndex) {
+        html += `<button class="load-more-btn" onclick="loadMoreResults()">Load More Results</button>`;
+      }
+
+      searchResults.innerHTML = html;
+      searchResults.classList.add('active');
+    }
+
+    function loadMoreResults() {
+      currentPage++;
+      displaySearchResults();
+    }
+
+    function handleSearchResultClick(element) {
+      const product = JSON.parse(element.dataset.product);
+      showProductModal(product);
+      searchResults.classList.remove('active');
+      searchInput.value = '';
+    }
+
+    // Close search results when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+        searchResults.classList.remove('active');
+      }
+    });
+  </script>
+</body>
+</html>
+

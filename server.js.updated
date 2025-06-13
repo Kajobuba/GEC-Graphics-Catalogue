@@ -1,0 +1,65 @@
+// Original server.js file with fixed product update logic
+require('dotenv').config();
+const express = require('express');
+const app = express();
+const path = require('path');
+const fileUpload = require('express-fileupload');
+const cors = require('cors');
+const db = require('./js/db-connection');
+
+// Middleware
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.originalUrl}`);
+    next();
+});
+app.use(cors());
+app.use(express.static(__dirname));
+app.use(fileUpload());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Update product endpoint
+app.put('/api/product/:id', async (req, res) => {
+    try {
+        console.log('PUT endpoint for /api/product/:id triggered');
+        const productId = req.params.id;
+        const { Title, Description, Hours, hoursVisible, FolderId } = req.body;
+        
+        console.log(`Updating product ${productId}:`, req.body);
+        
+        // Build update query with all fields
+        let query = `
+            UPDATE Products 
+            SET Title = @Title,
+                Description = @Description,
+                Hours = @Hours,
+                HoursVisible = @HoursVisible,
+                FolderId = @FolderId
+            WHERE Id = @Id
+        `;
+        
+        // Execute with named parameters
+        await db.query(query, {
+            // Convert Id to number if numeric string
+            Id: isNaN(productId) ? productId : parseInt(productId),
+            Title: Title,
+            Description: Description,
+            Hours: Hours,
+            HoursVisible: hoursVisible ? 1 : 0,
+            FolderId: FolderId === "" ? null : FolderId
+        });
+        
+        res.json({ 
+            success: true, 
+            message: 'Product updated successfully',
+            productId: productId
+        });
+    } catch (err) {
+        console.error('Error updating product:', err);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Error updating product',
+            error: err.message
+        });
+    }
+});

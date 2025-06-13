@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order History - GEC Digital Energy Portal</title>
+    <link rel="icon" type="image/x-icon" href="images/logo.jpg">
+    <style>
+        :root {
+            --primary-green: #14a37f;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: var(--primary-green);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .orders-container {
+            display: grid;
+            gap: 20px;
+        }
+
+        .order-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .order-date {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .order-status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            background: #e8f7f3;
+            color: var(--primary-green);
+            font-weight: 500;
+        }
+
+        .order-details {
+            margin-bottom: 15px;
+        }
+
+        .order-details p {
+            margin: 5px 0;
+            color: #444;
+        }
+
+        .order-items {
+            margin-top: 15px;
+        }
+
+        .item-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .item-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-title {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .item-path {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .item-hours {
+            font-size: 0.9em;
+            color: var(--primary-green);
+        }
+
+        .total-hours {
+            text-align: right;
+            font-weight: 500;
+            color: var(--primary-green);
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .no-orders {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .order-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .item-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .item-image {
+                width: 100%;
+                max-width: 200px;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Order History</h1>
+        <div class="orders-container" id="ordersContainer">
+            <!-- Orders will be loaded here -->
+        </div>
+    </div>
+
+    <script>
+        async function loadOrders() {
+            const ordersContainer = document.getElementById('ordersContainer');
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/orders');
+                if (!response.ok) throw new Error('Failed to fetch orders');
+                
+                const orders = await response.json();
+                
+                if (orders.length === 0) {
+                    ordersContainer.innerHTML = '<div class="no-orders">No orders found</div>';
+                    return;
+                }                ordersContainer.innerHTML = orders.map(order => `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div class="order-date">
+                                Ordered on ${new Date(order.CreatedAt).toLocaleDateString()}
+                            </div>
+                            <div class="order-status">
+                                ${order.Status || 'Pending'}
+                            </div>
+                        </div>
+                        <div class="order-details">
+                            <p><strong>Contact:</strong> ${order.CustomerName}</p>
+                            <p><strong>Email:</strong> ${order.CustomerEmail}</p>
+                            <p><strong>Branch:</strong> ${order.Branch}</p>
+                            <p><strong>Delivery Expected:</strong> ${new Date(order.DeliveryDate).toLocaleDateString()}</p>
+                            <p><strong>Shared Link:</strong> <a href="${order.SharedLink}" target="_blank">${order.SharedLink}</a></p>
+                            <p><strong>Remarks:</strong> ${order.Remarks || 'None'}</p>
+                        </div>
+                        <div class="order-items">
+                            ${(order.items || []).map(item => `
+                                <div class="item-card">
+                                    <img src="${item.imageUrl || 'images/placeholder.png'}" alt="${item.productTitle}" class="item-image">
+                                    <div class="item-details">
+                                        <div class="item-title">${item.productTitle}</div>
+                                        <div class="item-path">Product ID: ${item.ProductId}</div>
+                                        <div class="item-hours">
+                                            Quantity: ${item.Quantity} × ${item.Hours} hours = ${item.Quantity * item.Hours} hours
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="total-hours">
+                            Total Hours: ${order.TotalHours}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                ordersContainer.innerHTML = `
+                    <div class="no-orders">
+                        Failed to load orders. Please try again later.
+                    </div>
+                `;
+            }
+        }
+
+        // Load orders when page loads
+        document.addEventListener('DOMContentLoaded', loadOrders);
+    </script>
+</body>
+</html>

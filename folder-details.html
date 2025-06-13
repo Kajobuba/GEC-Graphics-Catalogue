@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Folder Details</title>
+    <link rel="icon" href="img/logo.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        
+        .product-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        .product-hours {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .btn-add-to-cart {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-add-to-cart:hover {
+            background: #0056b3;
+        }
+
+        .back-button {
+            margin: 20px;
+            padding: 8px 16px;
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .back-button:hover {
+            background: #e9ecef;
+        }
+
+        .folder-header {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .folder-name {
+            margin: 0;
+            color: #333;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <!-- Add your header here -->
+    </header>
+
+    <main>
+        <a href="page4.html" class="back-button">
+            <i class="fas fa-arrow-left"></i>
+            Back to Folders
+        </a>
+
+        <div class="folder-header">
+            <h1 class="folder-name" id="folderName">Loading folder...</h1>
+        </div>
+
+        <div class="product-grid" id="productGrid">
+            <div style="text-align: center; padding: 20px; grid-column: 1/-1;">
+                Loading products...
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const selectedFolderId = localStorage.getItem('selectedFolderId');
+
+        if (!selectedFolderId) {
+            window.location.href = 'page4.html';
+        }
+
+        async function loadFolderDetails() {
+            try {
+                const [folderResponse, productsResponse] = await Promise.all([
+                    fetch('http://localhost:3000/api/folders'),
+                    fetch('http://localhost:3000/api/products')
+                ]);
+
+                if (!folderResponse.ok || !productsResponse.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+
+                const folders = await folderResponse.json();
+                const products = await productsResponse.json();
+
+                const folder = folders.find(f => f.id === selectedFolderId);
+                if (!folder) {
+                    throw new Error('Folder not found');
+                }
+
+                // Update folder name
+                document.getElementById('folderName').textContent = folder.name;
+
+                // Filter products by folder
+                const folderProducts = products.filter(p => p.FolderId === folder.id);
+                const productGrid = document.getElementById('productGrid');
+
+                if (folderProducts.length === 0) {
+                    productGrid.innerHTML = '<div style="text-align: center; padding: 20px; grid-column: 1/-1;">No products in this folder.</div>';
+                    return;
+                }
+
+                productGrid.innerHTML = folderProducts.map(product => `
+                    <div class="product-card">
+                        <img src="${product.ImagePath || product.image_path}" 
+                             alt="${product.Title}" 
+                             class="product-image">
+                        <div class="product-title">${product.Title}</div>
+                        <div class="product-hours">${product.Hours} hrs</div>
+                        <button onclick="addToCart(${JSON.stringify(product)})" 
+                                class="btn-add-to-cart">
+                            <i class="fas fa-cart-plus"></i>
+                            Add to Cart
+                        </button>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading folder details:', error);
+                document.getElementById('productGrid').innerHTML = `
+                    <div style="color: #dc3545; text-align: center; padding: 20px; grid-column: 1/-1;">
+                        Error loading folder details. Please try again later.
+                    </div>
+                `;
+            }
+        }
+
+        function addToCart(product) {
+            const existingItem = cart.find(item => item.id === product.id);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    ...product,
+                    quantity: 1
+                });
+            }
+            
+            localStorage.setItem('cart', JSON.stringify(cart));
+            alert('Product added to cart!');
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', loadFolderDetails);
+    </script>
+</body>
+</html>

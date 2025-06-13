@@ -1,0 +1,88 @@
+<div style="font-family: system-ui, sans-serif, Arial; font-size: 14px; color: #333; padding: 14px 8px; background-color: #f5f5f5;">
+<div style="max-width: 600px; margin: auto; background-color: #fff;">
+    <div style="border-top: 6px solid #3DCD58; padding: 16px;">
+        <img src="https://your-domain.com/images/schneider-logo.png" alt="GEC Logo" style="height: 40px;">
+        <div style="font-size: 24px; color: #3DCD58; margin-top: 10px;">Order Confirmation</div>
+    </div>
+    <div style="padding: 0 16px;">
+        <p>Thank you for your order! We'll process your request and get back to you soon.</p>
+        <div style="text-align: left; font-size: 14px; padding-bottom: 4px; border-bottom: 2px solid #333;">
+            <strong>Order Details</strong>
+        </div>
+        
+        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+            <tbody>
+                <tr>
+                    <td style="padding: 8px 0;"><strong>Customer Name:</strong></td>
+                    <td style="padding: 8px 0;">{{to_name}}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0;"><strong>Email:</strong></td>
+                    <td style="padding: 8px 0;">{{to_email}}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0;"><strong>Branch:</strong></td>
+                    <td style="padding: 8px 0;">{{branch}}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0;"><strong>Expected Delivery:</strong></td>
+                    <td style="padding: 8px 0;">{{delivery_date}}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0;"><strong>Order Date:</strong></td>
+                    <td style="padding: 8px 0;">{{order_date}}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="margin-top: 30px;">
+            <div style="text-align: left; font-size: 14px; padding-bottom: 4px; border-bottom: 2px solid #333;">
+                <strong>Ordered Services</strong>
+            </div>
+            
+            <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                <thead>
+                    <tr style="background-color: #f5f5f5;">
+                        <th style="padding: 12px; text-align: left;">Service</th>
+                        <th style="padding: 12px; text-align: center;">Quantity</th>
+                        <th style="padding: 12px; text-align: center;">Hours per Unit</th>
+                        <th style="padding: 12px; text-align: right;">Total Hours</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each cart_items}}
+                    <tr>
+                        <td style="padding: 12px; border-bottom: 1px solid #eee;">{{item}}</td>
+                        <td style="padding: 12px; text-align: center; border-bottom: 1px solid #eee;">{{quantity}}</td>
+                        <td style="padding: 12px; text-align: center; border-bottom: 1px solid #eee;">{{price}}</td>
+                        <td style="padding: 12px; text-align: right; border-bottom: 1px solid #eee;">{{total}}</td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+
+            <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                <tr>
+                    <td style="width: 60%;">&nbsp;</td>
+                    <td style="border-top: 2px solid #333; padding: 16px 8px;">
+                        <strong>Total Hours:</strong>
+                    </td>
+                    <td style="border-top: 2px solid #333; padding: 16px 8px; text-align: right;">
+                        <strong>{{total_hours}}</strong>
+                    </td>
+                </tr>
+            </table>
+
+            <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px; padding: 12px; margin-top: 20px; font-size: 13px;">
+                <strong>Note:</strong> These are indicative hours – may vary based on actual requirement and inputs provided
+            </div>
+        </div>
+    </div>
+</div>
+<div style="max-width: 600px; margin: auto; padding-top: 20px;">
+    <p style="color: #999; font-size: 12px; text-align: center;">
+        This email was sent to {{to_email}}<br>
+        You received this email because you placed an order with GEC Digital Energy Portal
+    </p>
+</div>
+</div>

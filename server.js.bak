@@ -1,0 +1,170 @@
+require('dotenv').config();
+const express = require('express');
+const app = express();
+const path = require('path');
+const sql = require('mssql');
+const fileUpload = require('express-fileupload');
+const cors = require('cors');
+
+// SQL Server configuration
+const config = {
+    server: process.env.DB_SERVER,
+    database: process.env.DB_NAME,
+    options: {
+        trustServerCertificate: true,
+        encrypt: true,
+        trustedConnection: true,
+        integratedSecurity: true
+    }
+};
+
+// Middleware
+app.use(cors());
+app.use(express.static(__dirname));
+app.use(fileUpload());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Test database connection
+async function testConnection() {
+    try {
+        await sql.connect(config);
+        console.log('Connected to SQL Server successfully');
+    } catch (err) {
+        console.error('Database connection error:', err);
+    }
+}
+
+// API endpoints
+app.get('/api/products', async (req, res) => {
+    try {
+        await sql.connect(config);
+        const request = new sql.Request();
+        const result = await request.query(`
+            SELECT Id, Title, Description, Category, Type, Subcategory, Hours, 
+                   ImageData, ImageName, ImageContentType,
+                   CreatedAt, FolderId
+            FROM Products
+            ORDER BY CreatedAt DESC
+        `);
+        
+        const products = result.recordset.map(product => ({
+            ...product,
+            imageUrl: product.ImageData ? 
+                'data:' + product.ImageContentType + ';base64,' + product.ImageData.toString('base64') 
+                : null
+        }));
+        
+        res.json(products);
+    } catch (err) {
+        console.error('Error getting products:', err);
+        res.status(500).json({ success: false, message: 'Error retrieving products' });
+    }
+});
+
+app.post('/api/upload-product', async (req, res) => {
+    try {
+        if (!req.files || !req.files.image) {
+            return res.status(400).json({ success: false, message: 'No image uploaded' });
+        }
+
+        const { title, description, category, type, subcategory, hours } = req.body;
+        const image = req.files.image;
+
+        await sql.connect(config);
+        const request = new sql.Request();
+        
+        await request
+            .input('title', sql.NVarChar, title)
+            .input('description', sql.NVarChar, description)
+            .input('category', sql.NVarChar, category)
+            .input('type', sql.NVarChar, type)
+            .input('subcategory', sql.NVarChar, subcategory)
+            .input('hours', sql.Int, parseInt(hours))
+            .input('imageData', sql.VarBinary, image.data)
+            .input('imageName', sql.NVarChar, image.name)
+            .input('imageContentType', sql.NVarChar, image.mimetype)
+            .query("INSERT INTO Products (Title, Description, Category, Type, Subcategory, Hours, ImageData, ImageName, ImageContentType) VALUES (@title, @description, @category, @type, @subcategory, @hours, @imageData, @imageName, @imageContentType)");
+
+        res.json({ success: true, message: 'Product uploaded successfully' });
+    } catch (err) {
+        console.error('Error uploading product:', err);
+        res.status(500).json({ success: false, message: 'Error uploading product' });
+    }
+});
+
+app.post('/api/bulk-upload', async (req, res) => {
+    try {
+        if (!req.files || !req.files.images) {
+            return res.status(400).json({ success: false, message: 'No images uploaded' });
+        }
+
+        const { category, type, subcategory } = req.body;
+        const products = JSON.parse(req.body.products);
+        const images = Array.isArray(req.files.images) ? req.files.images : [req.files.images];
+
+        if (products.length !== images.length) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Number of products does not match number of images' 
+            });
+        }
+
+        await sql.connect(config);
+        const transaction = new sql.Transaction();
+        
+        try {
+            await transaction.begin();
+            const request = new sql.Request(transaction);
+            
+            for (let i = 0; i < products.length; i++) {
+                const product = products[i];
+                const image = images[i];
+                
+                await request
+                    .input('title', sql.NVarChar, product.title)
+                    .input('description', sql.NVarChar, product.description)
+                    .input('category', sql.NVarChar, category)
+                    .input('type', sql.NVarChar, type)
+                    .input('subcategory', sql.NVarChar, subcategory)
+                    .input('hours', sql.Int, product.hours || 12)
+                    .input('imageData', sql.VarBinary, image.data)
+                    .input('imageName', sql.NVarChar, image.name)
+                    .input('imageContentType', sql.NVarChar, image.mimetype)
+                    .query("INSERT INTO Products (Title, Description, Category, Type, Subcategory, Hours, ImageData, ImageName, ImageContentType) VALUES (@title, @description, @category, @type, @subcategory, @hours, @imageData, @imageName, @imageContentType)");
+            }
+            
+            await transaction.commit();
+            res.json({ success: true, message: 'Products uploaded successfully' });
+        } catch (err) {
+            await transaction.rollback();
+            throw err;
+        }
+    } catch (err) {
+        console.error('Bulk upload error:', err);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Error uploading products', 
+            error: err.message 
+        });
+    }
+});
+
+app.delete('/api/product/:id', async (req, res) => {
+    try {
+        await sql.connect(config);
+        const request = new sql.Request();
+        await request.query`DELETE FROM Products WHERE Id = ${req.params.id}`;
+        res.json({ success: true, message: 'Product deleted successfully' });
+    } catch (err) {
+        console.error('Error deleting product:', err);
+        res.status(500).json({ success: false, message: 'Error deleting product' });
+    }
+});
+
+// Start server
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
+    testConnection();
+});
